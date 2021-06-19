@@ -3,3 +3,5 @@ test/
 .env
 .vscode/
 tests/
+temp/
+pars_ua.py
