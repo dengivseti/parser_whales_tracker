@@ -1,3 +1,5 @@
 .venv
 test/
 .env
+.vscode/
+tests/

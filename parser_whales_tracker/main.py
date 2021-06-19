@@ -1,8 +1,14 @@
 import requests
 import os
+import sys
 import dotenv
 
+from loguru import logger
+
 dotenv.load_dotenv(".env")
+
+logger.remove()
+logger.add(sys.stderr, level="INFO")
 
 
 class Parser:
@@ -48,10 +54,10 @@ class Parser:
             self.last_hits += hour.get("hits_last", 0)
             self.uniq += hour.get("uniques", 0)
             self.last_uniq += hour.get("uniques_last", 0)
-        print(
+        logger.info(
             f"TODAY. Hit: {self.hits} Uniq: {self.uniq} Sale: {self.sales} Amount: {round(self.amount, 2)}"
         )
-        print(
+        logger.info(
             f"Yesterday. Hit: {self.last_hits} Uniq: {self.last_uniq} Sale: {self.last_sales} Amount: {round(self.last_amount, 2)}"
         )
 
@@ -63,7 +69,7 @@ class Parser:
             self.login()
             self.get_stats()
         except Exception as e:
-            print(f"Error: {e}")
+            logger.error(f"Error: {e}")
             if self.is_auth:
                 self.logout()
 
