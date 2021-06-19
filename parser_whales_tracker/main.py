@@ -103,10 +103,10 @@ class Parser:
             last_hits += hour.get("hits_last", 0)
             uniq += hour.get("uniques", 0)
             last_uniq += hour.get("uniques_last", 0)
-        msg_today = f"Hit: {hits} Uniq: {uniq} Sale: {sales} Amount: {round(amount, 2)}"
+        msg_today = f"STATS: {hits}|{uniq}|{sales}|{round(amount, 2)}"
         logger.info(f"TODAY. {msg_today}")
         logger.info(
-            f"Yesterday. Hits: {last_hits} Uniq: {last_uniq} Sales: {last_sales} Amount: {round(last_amount, 2)}"
+            f"Yesterday. {last_hits}|{last_uniq}|{last_sales}|{round(last_amount, 2)}"
         )
 
         lst_ua = [click["useragent"] for click in last_click]
@@ -118,7 +118,7 @@ class Parser:
 
         self.send_telegram(f"{self.get_time} {msg_today}")
         if self.prev_hits:
-            msg = f"Add Hits:{hits-self.prev_hits} Uniq:{uniq-self.prev_uniq} Sales:{sales-self.prev_sales} Amount:{round(amount-self.prev_amount, 2)}"
+            msg = f"Add {hits-self.prev_hits}|{uniq-self.prev_uniq}|{sales-self.prev_sales}|{round(amount-self.prev_amount, 2)}"
             self.send_telegram(msg)
             logger.info(msg)
         self.prev_sales = sales
