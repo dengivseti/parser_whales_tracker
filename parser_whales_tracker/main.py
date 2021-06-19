@@ -27,6 +27,10 @@ class Parser:
     def __init__(self):
         self._session = requests.Session()
         self.is_auth = False
+        self.prev_uniq = 0
+        self.prev_hits = 0
+        self.prev_sales = 0
+        self.prev_amount = 0
 
     def send_telegram(self, msg):
         try:
@@ -58,6 +62,7 @@ class Parser:
 
     def login(self):
         if self.is_auth:
+            logger.info(f"Already auth {self._session.cookies}")
             return
         url = f"{URL}/api/auth/login"
         data = {"username": LOGIN, "password": PASSWORD}
@@ -67,8 +72,8 @@ class Parser:
         self.is_auth = True
 
     def logout(self):
-        self._session.get(f"{URL}/api/auth/logout")
         self.is_auth = False
+        self._session.get(f"{URL}/api/auth/logout")
         self._session.cookies.clear()
 
     def get_stats(self):
@@ -101,13 +106,25 @@ class Parser:
         msg_today = f"Hit: {hits} Uniq: {uniq} Sale: {sales} Amount: {round(amount, 2)}"
         logger.info(f"TODAY. {msg_today}")
         logger.info(
-            f"Yesterday. Hit: {last_hits} Uniq: {last_uniq} Sale: {last_sales} Amount: {round(last_amount, 2)}"
+            f"Yesterday. Hits: {last_hits} Uniq: {last_uniq} Sales: {last_sales} Amount: {round(last_amount, 2)}"
         )
-        self.send_telegram(f"{self.get_time} {msg_today}")
 
         lst_ua = [click["useragent"] for click in last_click]
         if lst_ua:
             self.setlstinfile("temp/ua.txt", lst_ua)
+
+        if self.prev_hits >= hits:
+            return
+
+        self.send_telegram(f"{self.get_time} {msg_today}")
+        if self.prev_hits:
+            msg = f"Add Hits:{hits-self.prev_hits} Uniq:{uniq-self.prev_uniq} Sales:{sales-self.prev_sales} Amount:{round(amount-self.prev_amount, 2)}"
+            self.send_telegram(msg)
+            logger.info(msg)
+        self.prev_sales = sales
+        self.prev_hits = hits
+        self.prev_uniq = uniq
+        self.prev_amount = amount
 
     def work(self):
         try:
@@ -121,6 +138,7 @@ class Parser:
 
 if __name__ == "__main__":
     pars = Parser()
+    pars.work()
 
     schedule.every().hour.at(":28").do(pars.work)
     schedule.every().hour.at(":58").do(pars.work)
