@@ -112,10 +112,6 @@ class Parser:
         lst_ua = [click["useragent"] for click in last_click]
         if lst_ua:
             self.setlstinfile("temp/ua.txt", lst_ua)
-
-        if self.prev_hits >= hits:
-            return
-
         self.send_telegram(f"{self.get_time} {msg_today}")
         if self.prev_hits:
             msg = f"Add {hits-self.prev_hits}|{uniq-self.prev_uniq}|{sales-self.prev_sales}|{round(amount-self.prev_amount, 2)}"
