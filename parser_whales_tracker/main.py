@@ -123,13 +123,16 @@ class Parser:
         self.prev_amount = amount
 
     def work(self):
-        try:
-            self.login()
-            self.get_stats()
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            if self.is_auth:
-                self.logout()
+        for i in range(3):
+            try:
+                self.login()
+                self.get_stats()
+                break
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                if self.is_auth:
+                    self.logout()
+                continue
 
 
 if __name__ == "__main__":
