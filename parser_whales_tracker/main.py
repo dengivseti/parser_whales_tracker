@@ -113,6 +113,11 @@ class Parser:
         if lst_ua:
             self.setlstinfile("temp/ua.txt", lst_ua)
         self.send_telegram(f"{self.get_time} {msg_today}")
+        if self.prev_hits > hits:
+            self.prev_sales = 0
+            self.prev_hits = 0
+            self.prev_uniq = 0
+            self.prev_amount = 0
         if self.prev_hits:
             msg = f"Add {hits-self.prev_hits}|{uniq-self.prev_uniq}|{sales-self.prev_sales}|{round(amount-self.prev_amount, 2)}"
             self.send_telegram(msg)
